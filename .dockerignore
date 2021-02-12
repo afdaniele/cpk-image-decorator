@@ -7,7 +7,6 @@
 !launchers
 !dependencies-apt.txt
 !dependencies-py3.txt
-!configurations.yaml
 !setup.sh
 
 

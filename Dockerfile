@@ -97,6 +97,9 @@ COPY ./launchers/. "${PROJECT_LAUNCHERS_PATH}/"
 COPY ./launchers/default.sh "${PROJECT_LAUNCHERS_PATH}/"
 RUN cpk-install-launchers "${PROJECT_LAUNCHERS_PATH}"
 
+# copy setup file
+COPY ./setup.sh ${PROJECT_PATH}/
+
 # source environment on every bash session
 RUN echo "source ${CPK_INSTALL_DIR}/environment.sh" >> ~/.bashrc
 
