@@ -3,7 +3,7 @@
 set -e
 
 if [ "$#" -ne 1 ]; then
-    >&2 echo "ERROR: You need to pass a dependencies list file as an argument to cpk-pip3-install."
+    echo >&2 "ERROR: You need to pass a dependencies list file as an argument to cpk-pip3-install."
     exit 1
 fi
 
@@ -12,8 +12,8 @@ PACKAGES=$(awk -F: '/^[^#]/ { print $1 }' $PACKAGES_LIST | uniq)
 HAS_PACKAGES=$(echo $PACKAGES | sed '/^\s*#/d;/^\s*$/d' | wc -l)
 
 if [ $HAS_PACKAGES -eq 1 ]; then
-  echo "Installing packages via PIP3..."
-  pip3 install -r ${PACKAGES_LIST}
+    echo "Installing packages via PIP3..."
+    pip3 install -r ${PACKAGES_LIST}
 else
-  echo "No packages to install via APT."
+    echo "No packages to install via PIP3."
 fi
