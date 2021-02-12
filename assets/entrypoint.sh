@@ -5,13 +5,6 @@ echo "==> Entrypoint"
 # if anything weird happens from now on, STOP
 set -e
 
-# reset health
-echo ND > /health
-
-# get container ID
-CPK_MODULE_INSTANCE=$(basename "$(cat /proc/1/cpuset)")
-export CPK_MODULE_INSTANCE
-
 cpk-debug() {
     if [ "${DEBUG}" = "1" ]; then
         echo "DEBUG: $1"
