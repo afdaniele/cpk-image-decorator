@@ -10,6 +10,8 @@ ARG BASE_TAG="NOT_SET"
 ARG ORGANIZATION="NOT_SET"
 ARG NAME="NOT_SET"
 
+ARG CPK_VERSION="NOT_SET"
+
 # ---
 # base image
 FROM ${BASE_REGISTRY}/${BASE_REPOSITORY}/${BASE_IMAGE}:${BASE_TAG}
@@ -26,6 +28,8 @@ ARG BASE_TAG
 ARG ORGANIZATION
 ARG NAME
 
+ARG CPK_VERSION
+
 ARG LAUNCHER=default
 
 # setup environment
@@ -35,18 +39,23 @@ ENV INITSYSTEM="off" \
     LANG="C.UTF-8" \
     LC_ALL="C.UTF-8" \
     PYTHONIOENCODING="UTF-8" \
-    DEBIAN_FRONTEND="noninteractive"
-
-# code environment
-ENV CPK_SOURCE_DIR="/code"
-ENV CPK_LAUNCHERS_DIR="/launch"
-WORKDIR "${CPK_SOURCE_DIR}"
+    DEBIAN_FRONTEND="noninteractive" \
+    # cpk environment
+    CPK_SOURCE_DIR="/code" \
+    CPK_LAUNCHERS_DIR="/launchers" \
+    CPK_INSTALL_DIR="/cpk"
+RUN mkdir -p ${CPK_INSTALL_DIR}/bin
+ENV PATH="${PATH}:${CPK_INSTALL_DIR}/bin"
 
 # copy QEMU
 COPY ./assets/qemu/${ARCH}/ /usr/bin/
 
 # copy binaries
-COPY ./assets/bin/. /usr/local/bin/
+COPY ./assets/bin/. ${CPK_INSTALL_DIR}/bin
+
+# copy entrypoint and environment
+COPY ./assets/entrypoint.sh ${CPK_INSTALL_DIR}/entrypoint.sh
+COPY ./assets/environment.sh ${CPK_INSTALL_DIR}/environment.sh
 
 # define/create project paths
 ARG PROJECT_PATH="${CPK_SOURCE_DIR}/cpk"
@@ -69,9 +78,6 @@ ENV \
 COPY ./dependencies-apt.txt "${PROJECT_PATH}/"
 RUN cpk-apt-install "${PROJECT_PATH}/dependencies-apt.txt"
 
-# upgrade PIP
-RUN pip3 install -U pip
-
 # install dependencies (PIP3)
 COPY ./dependencies-py3.txt "${PROJECT_PATH}/"
 RUN cpk-pip3-install "${PROJECT_PATH}/dependencies-py3.txt"
@@ -91,6 +97,12 @@ COPY ./launchers/. "${PROJECT_LAUNCHERS_PATH}/"
 COPY ./launchers/default.sh "${PROJECT_LAUNCHERS_PATH}/"
 RUN cpk-install-launchers "${PROJECT_LAUNCHERS_PATH}"
 
+# source environment on every bash session
+RUN echo "source ${CPK_INSTALL_DIR}/environment.sh" >> ~/.bashrc
+
+# configure entrypoint
+ENTRYPOINT ["/cpk/entrypoint.sh"]
+
 # define default command
 CMD ["bash", "-c", "launcher-${CPK_LAUNCHER}"]
 
@@ -105,4 +117,5 @@ LABEL \
     cpk.label.project.${ORGANIZATION}.${NAME}.base.project="${BASE_IMAGE}" \
     cpk.label.project.${ORGANIZATION}.${NAME}.base.tag="${BASE_TAG}" \
     cpk.label.project.${ORGANIZATION}.${NAME}.maintainer="${MAINTAINER}" \
+    cpk.label.cpk.version="${CPK_VERSION}" \
     cpk.label.architecture="${ARCH}"

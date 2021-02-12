@@ -12,6 +12,9 @@ OUT_REPOSITORY=cpk
 OUT_IMAGE=ubuntu
 OUT_TAG=focal
 
+# TODO: get this from git tag and make sure the index is clean
+CPK_VERSION="NOT_SET"
+
 all:
 	#for arch in arm32v7 arm64v8 amd64 ; do \
 
@@ -27,5 +30,6 @@ all:
 			--build-arg ORGANIZATION="${OUT_REPOSITORY}" \
 			--build-arg NAME="${OUT_IMAGE}" \
 			--build-arg MAINTAINER=${MAINTAINER} \
+			--build-arg CPK_VERSION="${CPK_VERSION}" \
 			${ROOT_DIR}; \
     done;

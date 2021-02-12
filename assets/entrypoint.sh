@@ -28,10 +28,10 @@ cpk-configure-python() {
         cpk-debug " > Setting up Python for project $(basename $d)..."
         candidate_dir="${d}/packages"
         if [ -d "${candidate_dir}" ]; then
-            cpk-debug " > Adding ${candidate_dir} to PYTHONPATH."
+            cpk-debug "   > Adding ${candidate_dir} to PYTHONPATH."
             PYTHONPATH="${candidate_dir}:${PYTHONPATH}"
         else
-            cpk-debug " ! Directory ${candidate_dir} not found."
+            cpk-debug "   ! Directory ${candidate_dir} not found."
         fi
     done
 
@@ -41,7 +41,7 @@ cpk-configure-python() {
 
 cpk-configure-projects() {
     # source projects the same order they were created
-    for candidate_setup_file in $(find "${CPK_SOURCE_DIR}/*/setup.sh" -type f -printf "%T@ %p\n" | sort -n | awk '{print $2}'); do
+    for candidate_setup_file in $(find ${CPK_SOURCE_DIR}/*/setup.sh -type f -printf "%T@ %p\n" | sort -n | awk '{print $2}'); do
         project_name="$(basename $(dirname ${candidate_setup_file}))"
         cpk-debug " > Setting up project ${project_name}..."
         cpk-debug "   > Sourcing file ${candidate_setup_file}..."
@@ -65,9 +65,6 @@ export CPK_ENTRYPOINT_SOURCED
 
 # if anything weird happens from now on, CONTINUE
 set +e
-
-# set container's health
-cpk-set-container-unhealthy
 
 echo "<== Entrypoint"
 
