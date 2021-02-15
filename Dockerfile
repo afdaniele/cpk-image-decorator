@@ -32,9 +32,13 @@ ARG CPK_VERSION
 
 ARG LAUNCHER=default
 
+# copy QEMU
+COPY ./assets/qemu/${ARCH}/ /usr/bin/
+
 # setup environment
 ENV INITSYSTEM="off" \
     QEMU_EXECVE="1" \
+    QEMU_VERSION="5.0.0-2" \
     TERM="xterm" \
     LANG="C.UTF-8" \
     LC_ALL="C.UTF-8" \
@@ -44,25 +48,22 @@ ENV INITSYSTEM="off" \
     CPK_SOURCE_DIR="/code" \
     CPK_LAUNCHERS_DIR="/launchers" \
     CPK_INSTALL_DIR="/cpk"
-RUN mkdir -p ${CPK_INSTALL_DIR}/bin
-ENV PATH="${PATH}:${CPK_INSTALL_DIR}/bin"
-
-# copy QEMU
-COPY ./assets/qemu/${ARCH}/ /usr/bin/
-
-# copy binaries
-COPY ./assets/bin/. ${CPK_INSTALL_DIR}/bin
-
-# copy entrypoint and environment
-COPY ./assets/entrypoint.sh ${CPK_INSTALL_DIR}/entrypoint.sh
-COPY ./assets/environment.sh ${CPK_INSTALL_DIR}/environment.sh
 
 # define/create project paths
 ARG PROJECT_PATH="${CPK_SOURCE_DIR}/cpk"
 ARG PROJECT_LAUNCHERS_PATH="${CPK_LAUNCHERS_DIR}/cpk"
-RUN mkdir -p "${PROJECT_PATH}"
-RUN mkdir -p "${PROJECT_LAUNCHERS_PATH}"
+RUN mkdir -p ${CPK_INSTALL_DIR}/bin && \
+    mkdir -p "${PROJECT_PATH}" && \
+    mkdir -p "${PROJECT_LAUNCHERS_PATH}"
 WORKDIR "${PROJECT_PATH}"
+
+# copy binaries
+COPY ./assets/bin/. ${CPK_INSTALL_DIR}/bin/
+ENV PATH="${PATH}:${CPK_INSTALL_DIR}/bin"
+
+# copy entrypoint and environment
+COPY ./assets/entrypoint.sh ${CPK_INSTALL_DIR}/entrypoint.sh
+COPY ./assets/environment.sh ${CPK_INSTALL_DIR}/environment.sh
 
 # keep some arguments as environment variables
 ENV \

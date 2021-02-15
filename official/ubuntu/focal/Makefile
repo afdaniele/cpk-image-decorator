@@ -16,9 +16,9 @@ OUT_TAG=focal
 CPK_VERSION="NOT_SET"
 
 all:
-	#for arch in arm32v7 arm64v8 amd64 ; do \
 
-	for arch in amd64 ; do \
+	#for arch in amd64 ; do \
+	for arch in amd64 arm32v7 arm64v8 ; do \
 		docker build \
 			-t "${OUT_REGISTRY}/${OUT_REPOSITORY}/${OUT_IMAGE}:${OUT_TAG}-$${arch}" \
 			-f ${ROOT_DIR}/Dockerfile \
